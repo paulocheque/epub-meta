@@ -1,0 +1,3 @@
+
+class EPubException(Exception):
+    pass
