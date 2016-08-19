@@ -77,3 +77,25 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
 
     print(get_epub_opf_xml('/path/to/my_epub_file.epub'))
 
+
+## Development
+
+Useful commands:
+
+    # Create a virtual env
+    make prepare
+
+    # Install al dependencies
+    make deps
+
+    # Run tests
+    make test
+
+    # Run tests with Tox (for all Python compatible versions)
+    make test_all
+
+    # Run coverage
+    make coverage
+
+    # Useful command for running tests before pushing to Git
+    make push
