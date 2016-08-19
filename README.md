@@ -2,8 +2,9 @@
 
 
 [![Build Status](https://travis-ci.org/paulocheque/epub-meta.png?branch=master)](https://travis-ci.org/paulocheque/epub-meta)
-[![Coverage Status](https://coveralls.io/repos/paulocheque/epub-meta/badge.png?branch=master)](https://coveralls.io/r/paulocheque/epub-meta?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/paulocheque/epub-meta/badge.svg?branch=master)](https://coveralls.io/github/paulocheque/epub-meta?branch=master)
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
+
 
 **Latest version: 0.0.1 (2016/08)**
 
