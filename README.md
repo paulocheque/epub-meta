@@ -8,7 +8,7 @@
 
 **Latest version: 0.0.1 (2016/08)**
 
-Small *Python* library to read *metadata* information from an *ePub* file. 
+Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
 It does not depends on any library and run on Python 3 and 2.
 
@@ -22,7 +22,11 @@ It does not depends on any library and run on Python 3 and 2.
 
 Discover the main metadata of the ePub file
 
-    print(get_epub_metadata('/path/to/my_epub_file.epub'))
+    >>> metadata = get_epub_metadata('/path/to/my_epub_file.epub')
+    >>> type(metadata)
+    <dict>
+    >>> metadata
+    { ... }
 
 Example:
 
@@ -32,12 +36,14 @@ Example:
     {
         'authors': [u'Scott Chacon'],
         'epub_version': u'2.0',
+        # ISBN, uuids etc
         'identifiers': [u'bf50c6e1-eb0a-4a1c-a2cd-ea8809ae086a', u'9781430218333'],
         'language': u'en',
         'publication_date': u'2009-08-19T00:00:00+00:00',
         'publisher': u'Springer',
         'subject': u'Software Development',
         'title': u'Pro Git',
+        # import base64 ; base64.b64decode(data.cover_image_content)
         'cover_image_content': [base64 string],
         'cover_image_extension': '.jpg',
         'toc': [
@@ -54,12 +60,20 @@ Example:
         ]
     }
 
-    # You can access the keys like this:
+You can access the dict keys using *dot* notation:
+
     data.authors
     data.epub_version
+    ...
 
+You should check for invalid ePub files or for unknown ePub conventions:
 
-To discover and parse yourself the ePub OPF file, you can get the content of the OPF - XML file:
+    try:
+        get_epub_metadata('/path/to/my_epub_file.epub')    
+    except EPubException as e:
+        print(e)
+
+To discover and parse yourself the ePub OPF file, you can get the content of the *OPF - XML* file:
 
     print(get_epub_opf_xml('/path/to/my_epub_file.epub'))
 
