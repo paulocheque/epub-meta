@@ -10,3 +10,11 @@ script:
 
 after_success:
   - coveralls
+
+# Travis image does not have Python 3.5 yet
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
