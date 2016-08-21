@@ -153,6 +153,8 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
     if not toc:
         # ePub 2.x
         tag = find_tag(opf_xmldoc, 'item', 'id', 'ncx')
+        if not tag:
+            tag = find_tag(opf_xmldoc, 'item', 'id', 'ncxtoc')
         if tag and 'href' in tag.attributes.keys():
             filepath = tag.attributes['href'].value
             # The ncx file path is relative to the OPF file
