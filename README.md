@@ -78,6 +78,20 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
     print(get_epub_opf_xml('/path/to/my_epub_file.epub'))
 
 
+## Change Log
+
+##### 0.0.2 (2016-08-22)
+
+- Fixed TOC discovering for ePub v3 files
+
+##### 0.0.1 (2016-08-19)
+
+- `get_epub_metadata(path, read_cover_image=True, read_toc=True)` function
+- `get_epub_opf_xml(path)` function
+- Read cover image content in base64
+- Read TOC contents as an list of strings
+
+
 ## Development
 
 Useful commands:
