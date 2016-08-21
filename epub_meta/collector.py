@@ -130,16 +130,38 @@ def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
 def _discover_toc(zf, opf_xmldoc, opf_filepath):
     toc = None
 
-    tag = find_tag(opf_xmldoc, 'item', 'id', 'ncx')
+    # ePub 3.x
+    tag = find_tag(opf_xmldoc, 'item', 'properties', 'nav')
     if tag and 'href' in tag.attributes.keys():
         filepath = tag.attributes['href'].value
-        # The ncx file path is relative to the OPF file
+        # The xhtml file path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
-        # print('- Reading NCX file: {}/{}'.format(base_dir, filepath))
-        ncx_content = zf.read(os.path.join(base_dir, filepath))
+        # print('- Reading Nav file: {}/{}'.format(base_dir, filepath))
+        nav_content = zf.read(os.path.join(base_dir, filepath))
+        toc_xmldoc = minidom.parseString(nav_content)
 
-        toc_xmldoc = minidom.parseString(ncx_content)
-        toc = [n.firstChild.nodeValue for n in toc_xmldoc.getElementsByTagName('text') if n.firstChild]
+        _toc = []
+        for n in toc_xmldoc.getElementsByTagName('a'):
+            if n.firstChild and ('href' in n.attributes.keys()):
+                href = n.attributes['href'].value
+                # Discarding CFI links
+                if '.html' in href or '.xhtml' in href:
+                    _toc.append(n.firstChild.nodeValue)
+        if _toc:
+            toc = _toc
+
+    if not toc:
+        # ePub 2.x
+        tag = find_tag(opf_xmldoc, 'item', 'id', 'ncx')
+        if tag and 'href' in tag.attributes.keys():
+            filepath = tag.attributes['href'].value
+            # The ncx file path is relative to the OPF file
+            base_dir = os.path.dirname(opf_filepath)
+            # print('- Reading NCX file: {}/{}'.format(base_dir, filepath))
+            ncx_content = zf.read(os.path.join(base_dir, filepath))
+
+            toc_xmldoc = minidom.parseString(ncx_content)
+            toc = [n.firstChild.nodeValue for n in toc_xmldoc.getElementsByTagName('text') if n.firstChild]
 
     return toc
 
