@@ -1,4 +1,4 @@
-VERSION="0.0.1"
+VERSION=0.0.2
 
 clean:
 	clear
@@ -40,14 +40,14 @@ compile:
 	env/bin/python -OO -m compileall .
 
 lib:
-	clean ; env/bin/python setup.py clean --all
-	clean ; env/bin/python setup.py test
-	clean ; env/bin/python setup.py build
+	clear ; env/bin/python setup.py clean --all
+	clear ; env/bin/python setup.py test
+	clear ; env/bin/python setup.py build
 
 register:
-	clean ; env/bin/python setup.py clean --all
+	clear ; env/bin/python setup.py clean --all
 	clear ; env/bin/python setup.py sdist
-	clean ; env/bin/python setup.py register
+	clear ; env/bin/python setup.py register
 
 publish:
     # http://guide.python-distribute.org/quickstart.html
@@ -60,7 +60,7 @@ publish:
     # Go to 'edit' link
     # Update version and save
     # Go to 'files' link and upload the file
-	clean ; env/bin/python setup.py clean sdist upload
+	clear ; env/bin/python setup.py clean sdist upload
 
 tag:
 	git tag ${VERSION}
@@ -68,4 +68,4 @@ tag:
 
 reset_tag:
 	git tag -d ${VERSION}
-	git push origin :refs/tags/ ${VERSION}
+	git push origin :refs/tags/${VERSION}

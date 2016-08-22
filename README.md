@@ -2,11 +2,11 @@
 
 
 [![Build Status](https://travis-ci.org/paulocheque/epub-meta.png?branch=master)](https://travis-ci.org/paulocheque/epub-meta)
-[![Coverage Status](https://coveralls.io/repos/github/paulocheque/epub-meta/badge.svg)](https://coveralls.io/github/paulocheque/epub-meta)
+[![Coverage Status](https://coveralls.io/repos/github/paulocheque/epub-meta/badge.svg?ts=1)](https://coveralls.io/github/paulocheque/epub-meta)
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
 
 
-**Latest version: 0.0.1 (2016/08)**
+**Latest version: 0.0.2 (2016/08)**
 
 Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
@@ -14,7 +14,7 @@ It does not depends on any library and run on Python 3 and 2.
 
 ## Installation
 
-    pip install epub_meta==0.0.1
+    pip install epub_meta==0.0.2
 
 ## Usage
 
