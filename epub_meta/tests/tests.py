@@ -163,6 +163,20 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.toc, ['Pro Git', 'Getting Started', 'Git Basics', 'Git Branching', 'Git on the Server', 'Distributed Git', 'Git Tools', 'Customizing Git', 'Git and Other Systems', 'Git Internals'])
 
+    def test_file_size(self):
+        data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
+        self.assertEqual(data.file_size_in_bytes, 325803)
+        data = get_epub_metadata(os.path.join(dir_path, 'georgia-cfi-20120521.epub'))
+        self.assertEqual(data.file_size_in_bytes, 1095025)
+        data = get_epub_metadata(os.path.join(dir_path, 'georgia-pls-ssml-20120322.epub'))
+        self.assertEqual(data.file_size_in_bytes, 546553)
+        data = get_epub_metadata(os.path.join(dir_path, 'mathjax_tests.epub'))
+        self.assertEqual(data.file_size_in_bytes, 809373)
+        data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'))
+        self.assertEqual(data.file_size_in_bytes, 1670383)
+        data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
+        self.assertEqual(data.file_size_in_bytes, 4346158)
+
 
 class GetOpfXmlTests(unittest.TestCase):
     def test_inexistent_file(self):

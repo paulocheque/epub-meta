@@ -57,7 +57,8 @@ Example:
             u'Customizing Git',
             u'Git and Other Systems',
             u'Git Internals'
-        ]
+        ],
+        'file_size_in_bytes': 4346158
     }
 
 You can access the dict keys using *dot* notation:

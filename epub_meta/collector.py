@@ -188,6 +188,8 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     opf = zf.read(opf_filepath)
     opf_xmldoc = minidom.parseString(opf)
 
+    file_size_in_bytes = os.path.getsize(filepath)
+
     data = odict({
         'epub_version': _discover_epub_version(opf_xmldoc),
         'title': _discover_title(opf_xmldoc),
@@ -197,6 +199,7 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         'publication_date': _discover_publication_date(opf_xmldoc),
         'identifiers': _discover_identifiers(opf_xmldoc),
         'subject': _discover_subject(opf_xmldoc),
+        'file_size_in_bytes': file_size_in_bytes,
     })
 
     if read_cover_image:
