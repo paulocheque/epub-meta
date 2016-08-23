@@ -6,7 +6,7 @@
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
 
 
-**Latest version: 0.0.2 (2016/08)**
+**Latest version: 0.0.3 (2016/08)**
 
 Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
@@ -14,7 +14,7 @@ It does not depends on any library and run on Python 3 and 2.
 
 ## Installation
 
-    pip install epub_meta==0.0.2
+    pip install epub_meta==0.0.3
 
 ## Usage
 
@@ -80,6 +80,10 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
 
 
 ## Change Log
+
+##### 0.0.3 (2016-08-23)
+
+- Added the file size into the metadata dict
 
 ##### 0.0.2 (2016-08-22)
 
