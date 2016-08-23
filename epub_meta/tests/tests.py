@@ -1,9 +1,10 @@
 # coding: utf-8
 import os
+import json
 import unittest
-from pprint import pprint
 
 from epub_meta import get_epub_metadata, get_epub_opf_xml, EPubException
+from epub_meta.collector import IS_PY2
 
 
 dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../samples')
@@ -177,6 +178,17 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.file_size_in_bytes, 4346158)
 
+    def test_encoding(self):
+        data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
+        if IS_PY2:
+            self.assertEqual(type(data.title), unicode)
+            self.assertEqual(type(data.toc[0]), unicode)
+            self.assertEqual(type(data.toc[1]), unicode)
+        else:
+            self.assertEqual(type(data.title), str)
+            self.assertEqual(type(data.toc[0]), str)
+            self.assertEqual(type(data.toc[1]), str)
+
 
 class GetOpfXmlTests(unittest.TestCase):
     def test_inexistent_file(self):
@@ -197,4 +209,4 @@ class PrintEPubMetadataTests(unittest.TestCase):
             'mathjax_tests.epub', 'moby-dick.epub', 'progit.epub')
         for sample in samples:
             data = get_epub_metadata(os.path.join(dir_path, sample), read_cover_image=False, read_toc=True)
-            pprint(data)
+            print(json.dumps(data, indent=4))

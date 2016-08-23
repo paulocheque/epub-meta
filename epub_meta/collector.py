@@ -2,8 +2,12 @@ import base64
 import os
 from xml.dom import minidom
 import zipfile
+import sys
 
 from epub_meta.exceptions import EPubException
+
+
+IS_PY2 = sys.version_info < (3, 0)
 
 
 class odict(dict):
