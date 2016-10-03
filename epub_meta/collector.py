@@ -66,7 +66,7 @@ def __discover_dc(opf_xmldoc, name, first_only=True):
                 value = [n.firstChild.nodeValue for n in opf_xmldoc.getElementsByTagName(tag_name) if n.firstChild]
         except (KeyError, IndexError):
             pass
-    return value
+    return value.strip() if value else value
 
 
 def _discover_title(opf_xmldoc):
@@ -169,6 +169,7 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
             toc_xmldoc = minidom.parseString(ncx_content)
             toc = [n.firstChild.nodeValue for n in toc_xmldoc.getElementsByTagName('text') if n.firstChild]
 
+    toc = list(filter(None, toc))
     return toc
 
 
