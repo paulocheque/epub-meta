@@ -69,3 +69,7 @@ tag:
 reset_tag:
 	git tag -d ${VERSION}
 	git push origin :refs/tags/${VERSION}
+
+run_file:
+	# make FILE=FILE_PATH run_file
+	clear ; env/bin/python -m epub_meta.runner $(FILE)
