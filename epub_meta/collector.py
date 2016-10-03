@@ -66,7 +66,10 @@ def __discover_dc(opf_xmldoc, name, first_only=True):
                 value = [n.firstChild.nodeValue for n in opf_xmldoc.getElementsByTagName(tag_name) if n.firstChild]
         except (KeyError, IndexError):
             pass
-    return value.strip() if value else value
+    if first_only:
+        return value.strip() if value else value
+    else:
+        return [v.strip() for v in value]
 
 
 def _discover_title(opf_xmldoc):
