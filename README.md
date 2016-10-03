@@ -6,7 +6,7 @@
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
 
 
-**Latest version: 0.0.3 (2016/08)**
+**Latest version: 0.0.4 (2016/08)**
 
 Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
@@ -14,7 +14,7 @@ It does not depends on any library and run on Python 3 and 2.
 
 ## Installation
 
-    pip install epub_meta==0.0.3
+    pip install epub_meta==0.0.4
 
 ## Usage
 
@@ -80,6 +80,14 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
 
 
 ## Change Log
+
+##### 0.0.4 (2016-11-02)
+
+- Backward incompatibility: Returning ToC as a list of objects instead of a list of strings
+- The ToC information includes the source of the section: property `src`
+- The ToC is hierarchical, so we include a `level` property to identify the depth of the toc item in the list
+- The ToC order is important, so we include a `index` property to keep the order explicit
+- Trimming some string values
 
 ##### 0.0.3 (2016-08-23)
 
