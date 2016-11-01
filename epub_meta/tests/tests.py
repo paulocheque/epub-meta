@@ -152,7 +152,16 @@ class GetEPubMetadataTests(unittest.TestCase):
 
     def test_toc(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
-        self.assertEqual(data.toc, ['Title Page', 'MongoDB Ruby Driver', 'Practical', 'Unit Testing Backbone Applications With Jasmine', 'Unit Testing Backbone Applications With QUnit And SinonJS', 'QUnit', 'SinonJS', 'Practical'])
+        self.assertEqual(data.toc, [
+            {'index': 0, 'title': 'Title Page', 'src': 'title_page.xhtml', 'level': 0},
+            {'title': 'MongoDB Ruby Driver', 'index': 1, 'src': 'ch2.xhtml', 'level': 0},
+            {'index': 2, 'level': 0, 'title': 'Practical', 'src': 'ch3.xhtml'},
+            {'title': 'Unit Testing Backbone Applications With Jasmine', 'index': 3, 'src': 'ch4.xhtml', 'level': 0},
+            {'title': 'Unit Testing Backbone Applications With QUnit And SinonJS', 'src': 'ch5.xhtml', 'level': 0, 'index': 4},
+            {'level': 0, 'index': 5, 'src': 'ch6.xhtml', 'title': 'QUnit'},
+            {'title': 'SinonJS', 'src': 'ch7.xhtml', 'level': 0, 'index': 6},
+            {'level': 0, 'title': 'Practical', 'index': 7, 'src': 'ch8.xhtml'}
+        ])
         data = get_epub_metadata(os.path.join(dir_path, 'georgia-cfi-20120521.epub'))
         self.assertEqual(len(data.toc), 10)
         data = get_epub_metadata(os.path.join(dir_path, 'georgia-pls-ssml-20120322.epub'))
@@ -162,7 +171,17 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'))
         self.assertEqual(len(data.toc), 143)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
-        self.assertEqual(data.toc, ['Pro Git', 'Getting Started', 'Git Basics', 'Git Branching', 'Git on the Server', 'Distributed Git', 'Git Tools', 'Customizing Git', 'Git and Other Systems', 'Git Internals'])
+        self.assertEqual(data.toc, [
+            {'src': 'progit_split_000.html', 'title': 'Getting Started', 'level': 0, 'index': 0},
+            {'title': 'Git Basics', 'level': 0, 'src': 'progit_split_008.html', 'index': 1},
+            {'index': 2, 'title': 'Git Branching', 'level': 0, 'src': 'progit_split_017.html'},
+            {'title': 'Git on the Server', 'src': 'progit_split_025.html', 'level': 0, 'index': 3},
+            {'title': 'Distributed Git', 'src': 'progit_split_037.html', 'level': 0, 'index': 4},
+            {'src': 'progit_split_042.html', 'title': 'Git Tools', 'index': 5, 'level': 0},
+            {'src': 'progit_split_051.html', 'title': 'Customizing Git', 'level': 0, 'index': 6},
+            {'index': 7, 'src': 'progit_split_057.html', 'title': 'Git and Other Systems', 'level': 0},
+            {'index': 8, 'title': 'Git Internals', 'src': 'progit_split_061.html', 'level': 0}
+        ])
 
     def test_file_size(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -182,12 +201,12 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         if IS_PY2:
             self.assertEqual(type(data.title), unicode)
-            self.assertEqual(type(data.toc[0]), unicode)
-            self.assertEqual(type(data.toc[1]), unicode)
+            self.assertEqual(type(data.toc[0]), dict)
+            self.assertEqual(type(data.toc[1]), dict)
         else:
             self.assertEqual(type(data.title), str)
-            self.assertEqual(type(data.toc[0]), str)
-            self.assertEqual(type(data.toc[1]), str)
+            self.assertEqual(type(data.toc[0]), dict)
+            self.assertEqual(type(data.toc[1]), dict)
 
 
 class GetOpfXmlTests(unittest.TestCase):

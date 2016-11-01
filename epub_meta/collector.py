@@ -135,6 +135,9 @@ def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
 
 
 def _discover_toc(zf, opf_xmldoc, opf_filepath):
+    '''
+    Returns a list of objects: {title: str, src: str, level: int, index: int}
+    '''
     toc = None
 
     # ePub 3.x
@@ -148,12 +151,29 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
         toc_xmldoc = minidom.parseString(nav_content)
 
         _toc = []
+
         for n in toc_xmldoc.getElementsByTagName('a'):
             if n.firstChild and ('href' in n.attributes.keys()):
                 href = n.attributes['href'].value
                 # Discarding CFI links
                 if '.html' in href or '.xhtml' in href:
-                    _toc.append(n.firstChild.nodeValue)
+                    title = n.firstChild.nodeValue
+                    # try the second node too (maybe the first child is an empty span)
+                    if not title and n.firstChild.firstChild:
+                        title = n.firstChild.firstChild.nodeValue
+
+                    title = title.strip() if title else None
+
+                    if title:
+                        level = -1
+                        parentNode = n.parentNode
+                        while parentNode.nodeName != 'nav':
+                            if parentNode.nodeName == 'ol': # count the depth of the a link related to ol items
+                                level += 1
+                            parentNode = parentNode.parentNode
+                        level = max(level, 0) # root level is 0, not -1
+
+                        _toc.append({'title': title, 'src': href, 'level': level})
         if _toc:
             toc = _toc
 
@@ -170,9 +190,44 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
             ncx_content = zf.read(os.path.join(base_dir, filepath))
 
             toc_xmldoc = minidom.parseString(ncx_content)
-            toc = [n.firstChild.nodeValue for n in toc_xmldoc.getElementsByTagName('text') if n.firstChild]
 
-    toc = list(filter(None, toc))
+            def read_nav_point(nav_point_node, level = 0):
+                items = []
+                item = {'title': None, 'src': None, 'level': level}
+                children_points = []
+                for item_node in nav_point_node.childNodes:
+                    if item_node.nodeName == 'navLabel':
+                        text = item_node.getElementsByTagName('text')[0].firstChild
+                        item['title'] = text.nodeValue.strip() if text and text.nodeValue else None
+                    elif item_node.nodeName == 'content':
+                        if item_node.hasAttribute('src'):
+                            item['src'] = item_node.attributes['src'].value
+                    elif item_node.nodeName == 'navPoint':
+                        children_points.append(item_node)
+
+                if item['title']:
+                    items.append(item)
+                    for child_node in children_points:
+                        subitems = read_nav_point(child_node, level = level + 1)
+                        items.extend(subitems)
+                return items
+
+            def read_nav_map(toc_xmldoc, level = 0):
+                items = []
+                nav_map_node = toc_xmldoc.getElementsByTagName('navMap')[0]
+                for nav_point in nav_map_node.childNodes:
+                    if nav_point.nodeName == 'navPoint':
+                        subitems = read_nav_point(nav_point, level=level)
+                        items.extend(subitems)
+                return items
+
+            toc = read_nav_map(toc_xmldoc)
+
+    # add indexes
+    if toc:
+        for i, t in enumerate(toc):
+            t['index'] = i
+
     return toc
 
 
