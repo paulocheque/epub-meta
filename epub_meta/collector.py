@@ -81,7 +81,16 @@ def _discover_language(opf_xmldoc):
 
 
 def _discover_authors(opf_xmldoc):
-    return list(set(__discover_dc(opf_xmldoc, 'creator', first_only=False)))
+    authors = __discover_dc(opf_xmldoc, 'creator', first_only=False)
+
+    # Slow and inefficient way to remove duplicates but maintain ordering just
+    # in case the author order in epub is significant.
+    unique_authors = []
+    for author in authors:
+        if author not in unique_authors:
+            unique_authors.append(author)
+
+    return unique_authors
 
 
 def _discover_publisher(opf_xmldoc):
