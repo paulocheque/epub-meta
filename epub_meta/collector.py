@@ -196,27 +196,43 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
                 item = {'title': None, 'src': None, 'level': level}
                 children_points = []
                 for item_node in nav_point_node.childNodes:
-                    if item_node.nodeName == 'navLabel':
-                        text = item_node.getElementsByTagName('text')[0].firstChild
+                    if item_node.nodeName in ('navLabel', 'ncx:navLabel'):
+                        try:
+                            text = item_node.getElementsByTagName('text')[0].firstChild
+                        except IndexError:
+                            try:
+                                text = item_node.getElementsByTagName('ncx:text')[0].firstChild
+                            except IndexError:
+                                text = None
+
                         item['title'] = text.nodeValue.strip() if text and text.nodeValue else None
-                    elif item_node.nodeName == 'content':
+                    elif item_node.nodeName in ('content', 'ncx:content'):
                         if item_node.hasAttribute('src'):
                             item['src'] = item_node.attributes['src'].value
-                    elif item_node.nodeName == 'navPoint':
+                    elif item_node.nodeName in ('navPoint', 'ncx:navPoint'):
                         children_points.append(item_node)
 
                 if item['title']:
                     items.append(item)
                     for child_node in children_points:
-                        subitems = read_nav_point(child_node, level = level + 1)
+                        subitems = read_nav_point(child_node, level=level + 1)
                         items.extend(subitems)
                 return items
 
-            def read_nav_map(toc_xmldoc, level = 0):
+            def read_nav_map(toc_xmldoc, level=0):
                 items = []
-                nav_map_node = toc_xmldoc.getElementsByTagName('navMap')[0]
+                try:
+                    nav_map_node = toc_xmldoc.getElementsByTagName('navMap')[0]
+                except IndexError:
+                    # Some ebooks use the ncx: namespace so try that too
+                    try:
+                        nav_map_node = toc_xmldoc.getElementsByTagName('ncx:navMap')[0]
+                    except IndexError:
+                        print('Failed reading TOC')
+                        return items
+
                 for nav_point in nav_map_node.childNodes:
-                    if nav_point.nodeName == 'navPoint':
+                    if nav_point.nodeName in ('navPoint', 'ncx:navPoint'):
                         subitems = read_nav_point(nav_point, level=level)
                         items.extend(subitems)
                 return items
