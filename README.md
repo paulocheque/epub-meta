@@ -47,16 +47,15 @@ Example:
         'cover_image_content': [base64 string],
         'cover_image_extension': '.jpg',
         'toc': [
-            u'Pro Git',
-            u'Getting Started',
-            u'Git Basics',
-            u'Git Branching',
-            u'Git on the Server',
-            u'Distributed Git',
-            u'Git Tools',
-            u'Customizing Git',
-            u'Git and Other Systems',
-            u'Git Internals'
+            {'index': 0, 'title': 'Getting Started', 'src': 'progit_split_000.html', 'level': 0},
+            {'index': 1, 'title': 'Git Basics', 'level': 0, 'src': 'progit_split_008.html'},
+            {'index': 2, 'title': 'Git Branching', 'level': 0, 'src': 'progit_split_017.html'},
+            {'index': 3, 'title': 'Git on the Server', 'src': 'progit_split_025.html', 'level': 0},
+            {'index': 4, 'title': 'Distributed Git', 'src': 'progit_split_037.html', 'level': 0},
+            {'index': 5, 'title': 'Git Tools', 'src': 'progit_split_042.html', 'index': 5, 'level': 0},
+            {'index': 6, 'title': 'Customizing Git', 'src': 'progit_split_051.html', 'level': 0},
+            {'index': 7, 'title': 'Git and Other Systems', 'src': 'progit_split_057.html', 'level': 0},
+            {'index': 8, 'title': 'Git Internals', 'src': 'progit_split_061.html', 'level': 0}
         ],
         'file_size_in_bytes': 4346158
     }
