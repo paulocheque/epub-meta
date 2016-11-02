@@ -32,6 +32,9 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.epub_version, '2.0')
 
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.epub_version, '2.0')
+
     def test_title(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
         self.assertEqual(data.title, 'Developing Backbone.js Applications')
@@ -45,6 +48,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.title, 'Moby-Dick')
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.title, 'Pro Git')
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.title, 'High Performance Computing')
 
     def test_language(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -58,6 +63,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'))
         self.assertEqual(data.language, 'en-US')
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
+        self.assertEqual(data.language, 'en')
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
         self.assertEqual(data.language, 'en')
 
     def test_authors(self):
@@ -73,6 +80,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.authors, ['Herman Melville'])
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.authors, ['Scott Chacon'])
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.authors, ['Charles Severance', 'Kevin Dowd'])
 
     def test_publisher(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -87,6 +96,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.publisher, 'Harper & Brothers, Publishers')
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.publisher, 'Springer')
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.publisher, None)
 
     def test_publication_date(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -101,6 +112,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.publication_date, None)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.publication_date, '2009-08-19T00:00:00+00:00')
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.publication_date, None)
 
     def test_identifiers(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -115,6 +128,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.identifiers, ['code.google.com.epub-samples.moby-dick-basic'])
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.identifiers, ['bf50c6e1-eb0a-4a1c-a2cd-ea8809ae086a', '9781430218333'])
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.identifiers, ['_id253509'])
 
     def test_subject(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -129,6 +144,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.subject, None)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.subject, 'Software Development')
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.subject, None)
 
     def test_cover_image(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
@@ -148,6 +165,9 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertIsNotNone(data.cover_image_content)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.cover_image_extension, '.jpg')
+        self.assertIsNotNone(data.cover_image_content)
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.cover_image_extension, '.png')
         self.assertIsNotNone(data.cover_image_content)
 
     def test_toc(self):
@@ -183,6 +203,21 @@ class GetEPubMetadataTests(unittest.TestCase):
             {'index': 8, 'title': 'Git Internals', 'src': 'progit_split_061.html', 'level': 0}
         ])
 
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.toc, [
+            {"src": "index.html", "level": 0, "index": 0, "title": "High Performance Computing"},
+            {"src": "pr01.html", "level": 1, "index": 1, "title": "Introduction to the Connexions Edition"},
+            {"src": "pr02.html", "level": 1, "index": 2, "title": "Introduction to High Performance Computing"},
+            {"src": "ch01.html", "level": 1, "index": 3, "title": "1. Modern Computer Architectures"},
+            {"src": "ch02.html", "level": 1, "index": 4, "title": "2. Programming and Tuning Software"},
+            {"src": "ch03.html", "level": 1, "index": 5, "title": "3. Shared-Memory Parallel Processors"},
+            {"src": "ch04.html", "level": 1, "index": 6, "title": "4. Scalable Parallel Processing"},
+            {"src": "ch05.html", "level": 1, "index": 7, "title": "5. Appendixes"},
+            {"src": "ix01.html", "level": 1, "index": 8, "title": "Index"},
+            {"src": "co01.html", "level": 1, "index": 9, "title": "Attributions"},
+            {"src": "co02.html", "level": 1, "index": 10, "title": "About Connexions"}
+        ])
+
     def test_file_size(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
         self.assertEqual(data.file_size_in_bytes, 325803)
@@ -196,6 +231,8 @@ class GetEPubMetadataTests(unittest.TestCase):
         self.assertEqual(data.file_size_in_bytes, 1670383)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.file_size_in_bytes, 4346158)
+        data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
+        self.assertEqual(data.file_size_in_bytes, 3045262)
 
     def test_encoding(self):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
