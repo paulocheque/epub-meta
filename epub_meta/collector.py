@@ -176,10 +176,12 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
                     if title:
                         level = -1
                         parentNode = n.parentNode
-                        while parentNode.nodeName != 'nav':
+                        avoid_infinite_loop = 0 # simple security issue to avoid infinite loop for bad epub files
+                        while parentNode and parentNode.nodeName != 'nav' and avoid_infinite_loop < 50:
                             if parentNode.nodeName == 'ol': # count the depth of the a link related to ol items
                                 level += 1
                             parentNode = parentNode.parentNode
+                            avoid_infinite_loop += 1
                         level = max(level, 0) # root level is 0, not -1
 
                         _toc.append({'title': title, 'src': href, 'level': level})
