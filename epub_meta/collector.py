@@ -81,7 +81,7 @@ def _discover_language(opf_xmldoc):
 
 
 def _discover_authors(opf_xmldoc):
-    return __discover_dc(opf_xmldoc, 'creator', first_only=False)
+    return list(set(__discover_dc(opf_xmldoc, 'creator', first_only=False)))
 
 
 def _discover_publisher(opf_xmldoc):
