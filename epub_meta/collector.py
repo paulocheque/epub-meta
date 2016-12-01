@@ -80,8 +80,45 @@ def _discover_language(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'language')
 
 
-def _discover_authors(opf_xmldoc):
+def _find_author_from_dom(xmldoc):
+    # Only find a single author now with this algorithm but returning a list
+    # because that's what caller expects
+    authors = []
+
+    # First non-empty child node is author after the author 'tag'
+    found_author_tag = False
+
+    for ii, p_tag in enumerate(xmldoc.getElementsByTagName('p')):
+        if not found_author_tag:
+            if not p_tag.hasChildNodes() or len(p_tag.childNodes) < 2:
+                continue
+
+            for strong_tag in p_tag.getElementsByTagName('strong'):
+                if strong_tag.hasChildNodes():
+                    tag = strong_tag.firstChild
+
+                    if tag.nodeType == tag.TEXT_NODE and tag.data == u'Author':
+                        found_author_tag = True
+        else:
+            if not p_tag.hasChildNodes():
+                continue
+
+            if p_tag.firstChild.nodeType == p_tag.firstChild.TEXT_NODE:
+                text = p_tag.firstChild.data.strip()
+                if text:
+                    authors.append(text)
+                    break
+
+    return authors
+
+
+def _discover_authors(opf_xmldoc, authors_html=None):
     authors = __discover_dc(opf_xmldoc, 'creator', first_only=False)
+
+    # We've found large portion of books from specific publishers that store
+    # the authors in pr02.html in a very specific place.
+    if not authors and authors_html is not None:
+        authors = _find_author_from_dom(authors_html)
 
     # Slow and inefficient way to remove duplicates but maintain ordering just
     # in case the author order in epub is significant.
@@ -278,13 +315,21 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     opf = zf.read(opf_filepath)
     opf_xmldoc = minidom.parseString(opf)
 
+    # This file is specific to the authors if it exists.
+    authors_html = None
+    try:
+        authors_html = minidom.parseString(zf.read('OEBPS/pr02.html'))
+    except KeyError:
+        # Most books store authors using epub tags, so no worries.
+        pass
+
     file_size_in_bytes = os.path.getsize(filepath)
 
     data = odict({
         'epub_version': _discover_epub_version(opf_xmldoc),
         'title': _discover_title(opf_xmldoc),
         'language': _discover_language(opf_xmldoc),
-        'authors': _discover_authors(opf_xmldoc),
+        'authors': _discover_authors(opf_xmldoc, authors_html=authors_html),
         'publisher': _discover_publisher(opf_xmldoc),
         'publication_date': _discover_publication_date(opf_xmldoc),
         'identifiers': _discover_identifiers(opf_xmldoc),
