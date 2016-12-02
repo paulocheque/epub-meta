@@ -18,6 +18,17 @@ class odict(dict):
         return self.get(attr)
 
 
+def iterate_all_tags(root):
+    for node in root.childNodes:
+        if node.nodeType != node.ELEMENT_NODE:
+            continue
+
+        yield node
+
+        for subnode in iterate_all_tags(node):
+            yield subnode
+
+
 def find_tag(xmldoc, tag_name, attr, value):
     # print('Finding tag: <{} {}="{}">'.format(tag_name, attr, value))
     for tag in xmldoc.getElementsByTagName(tag_name):
@@ -88,26 +99,25 @@ def _find_author_from_dom(xmldoc):
     # First non-empty child node is author after the author 'tag'
     found_author_tag = False
 
-    for ii, p_tag in enumerate(xmldoc.getElementsByTagName('p')):
+    for tag in iterate_all_tags(xmldoc):
         if not found_author_tag:
-            if not p_tag.hasChildNodes() or len(p_tag.childNodes) < 2:
-                continue
+            if tag.nodeName == 'strong' and tag.childNodes and (
+               tag.firstChild.nodeType == tag.firstChild.TEXT_NODE) and (
+               tag.firstChild.data in ('Author', 'Authors')):
 
-            for strong_tag in p_tag.getElementsByTagName('strong'):
-                if strong_tag.hasChildNodes():
-                    tag = strong_tag.firstChild
-
-                    if tag.nodeType == tag.TEXT_NODE and tag.data == u'Author':
-                        found_author_tag = True
+                found_author_tag = True
         else:
-            if not p_tag.hasChildNodes():
-                continue
+            # Find all paragraph tags BEFORE we find another span tag. Those
+            # are the author(s).
+            if tag.nodeName == 'span':
+                break
 
-            if p_tag.firstChild.nodeType == p_tag.firstChild.TEXT_NODE:
-                text = p_tag.firstChild.data.strip()
-                if text:
-                    authors.append(text)
-                    break
+            if tag.nodeName == 'p' and tag.childNodes and (
+               tag.firstChild.nodeType == tag.firstChild.TEXT_NODE):
+
+                data = tag.firstChild.data.strip()
+                if data:
+                    authors.append(data)
 
     return authors
 
@@ -145,6 +155,7 @@ def _discover_identifiers(opf_xmldoc):
 
 def _discover_subject(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'subject')
+
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
     '''
