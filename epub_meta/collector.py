@@ -18,6 +18,17 @@ class odict(dict):
         return self.get(attr)
 
 
+def iterate_all_tags(root):
+    for node in root.childNodes:
+        if node.nodeType != node.ELEMENT_NODE:
+            continue
+
+        yield node
+
+        for subnode in iterate_all_tags(node):
+            yield subnode
+
+
 def find_tag(xmldoc, tag_name, attr, value):
     # print('Finding tag: <{} {}="{}">'.format(tag_name, attr, value))
     for tag in xmldoc.getElementsByTagName(tag_name):
@@ -80,8 +91,44 @@ def _discover_language(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'language')
 
 
-def _discover_authors(opf_xmldoc):
+def _find_author_from_dom(xmldoc):
+    # Only find a single author now with this algorithm but returning a list
+    # because that's what caller expects
+    authors = []
+
+    # First non-empty child node is author after the author 'tag'
+    found_author_tag = False
+
+    for tag in iterate_all_tags(xmldoc):
+        if not found_author_tag:
+            if tag.nodeName == 'strong' and tag.childNodes and (
+               tag.firstChild.nodeType == tag.firstChild.TEXT_NODE) and (
+               tag.firstChild.data in ('Author', 'Authors')):
+
+                found_author_tag = True
+        else:
+            # Find all paragraph tags BEFORE we find another span tag. Those
+            # are the author(s).
+            if tag.nodeName == 'span':
+                break
+
+            if tag.nodeName == 'p' and tag.childNodes and (
+               tag.firstChild.nodeType == tag.firstChild.TEXT_NODE):
+
+                data = tag.firstChild.data.strip()
+                if data:
+                    authors.append(data)
+
+    return authors
+
+
+def _discover_authors(opf_xmldoc, authors_html=None):
     authors = __discover_dc(opf_xmldoc, 'creator', first_only=False)
+
+    # We've found large portion of books from specific publishers that store
+    # the authors in pr02.html in a very specific place.
+    if not authors and authors_html is not None:
+        authors = _find_author_from_dom(authors_html)
 
     # Slow and inefficient way to remove duplicates but maintain ordering just
     # in case the author order in epub is significant.
@@ -97,8 +144,23 @@ def _discover_publisher(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'publisher')
 
 
-def _discover_publication_date(opf_xmldoc):
-    return __discover_dc(opf_xmldoc, 'date')
+def _find_publish_date_from_dom(xmldoc):
+    first_pub = 'First published:'
+
+    for tag in iterate_all_tags(xmldoc):
+        if tag.nodeName == 'p' and tag.childNodes and (
+           tag.firstChild.nodeType == tag.TEXT_NODE) and (
+           tag.firstChild.data.startswith(first_pub)):
+            return tag.firstChild.data.split(first_pub)[1].strip()
+
+
+def _discover_publication_date(opf_xmldoc, date_html=None):
+    date = __discover_dc(opf_xmldoc, 'date')
+
+    if not date and date_html is not None:
+        date = _find_publish_date_from_dom(date_html)
+
+    return date
 
 
 def _discover_identifiers(opf_xmldoc):
@@ -108,6 +170,7 @@ def _discover_identifiers(opf_xmldoc):
 
 def _discover_subject(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'subject')
+
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
     '''
@@ -278,15 +341,33 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     opf = zf.read(opf_filepath)
     opf_xmldoc = minidom.parseString(opf)
 
+    # This file is specific to the authors if it exists.
+    authors_html = None
+    try:
+        authors_html = minidom.parseString(zf.read('OEBPS/pr02.html'))
+    except KeyError:
+        # Most books store authors using epub tags, so no worries.
+        pass
+
+    # This file is specific to the publish date if it exists.
+    publish_date_html = None
+    try:
+        publish_date_html = minidom.parseString(zf.read('OEBPS/pr01.html'))
+    except KeyError:
+        # Most books store authors using epub tags, so no worries.
+        pass
+
+
     file_size_in_bytes = os.path.getsize(filepath)
 
     data = odict({
         'epub_version': _discover_epub_version(opf_xmldoc),
         'title': _discover_title(opf_xmldoc),
         'language': _discover_language(opf_xmldoc),
-        'authors': _discover_authors(opf_xmldoc),
+        'authors': _discover_authors(opf_xmldoc, authors_html=authors_html),
         'publisher': _discover_publisher(opf_xmldoc),
-        'publication_date': _discover_publication_date(opf_xmldoc),
+        'publication_date': _discover_publication_date(opf_xmldoc,
+                                                       date_html=publish_date_html),
         'identifiers': _discover_identifiers(opf_xmldoc),
         'subject': _discover_subject(opf_xmldoc),
         'file_size_in_bytes': file_size_in_bytes,
