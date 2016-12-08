@@ -144,8 +144,23 @@ def _discover_publisher(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'publisher')
 
 
-def _discover_publication_date(opf_xmldoc):
-    return __discover_dc(opf_xmldoc, 'date')
+def _find_publish_date_from_dom(xmldoc):
+    first_pub = 'First published:'
+
+    for tag in iterate_all_tags(xmldoc):
+        if tag.nodeName == 'p' and tag.childNodes and (
+           tag.firstChild.nodeType == tag.TEXT_NODE) and (
+           tag.firstChild.data.startswith(first_pub)):
+            return tag.firstChild.data.split(first_pub)[1].strip()
+
+
+def _discover_publication_date(opf_xmldoc, date_html=None):
+    date = __discover_dc(opf_xmldoc, 'date')
+
+    if not date and date_html is not None:
+        date = _find_publish_date_from_dom(date_html)
+
+    return date
 
 
 def _discover_identifiers(opf_xmldoc):
@@ -334,6 +349,15 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         # Most books store authors using epub tags, so no worries.
         pass
 
+    # This file is specific to the publish date if it exists.
+    publish_date_html = None
+    try:
+        publish_date_html = minidom.parseString(zf.read('OEBPS/pr01.html'))
+    except KeyError:
+        # Most books store authors using epub tags, so no worries.
+        pass
+
+
     file_size_in_bytes = os.path.getsize(filepath)
 
     data = odict({
@@ -342,7 +366,8 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         'language': _discover_language(opf_xmldoc),
         'authors': _discover_authors(opf_xmldoc, authors_html=authors_html),
         'publisher': _discover_publisher(opf_xmldoc),
-        'publication_date': _discover_publication_date(opf_xmldoc),
+        'publication_date': _discover_publication_date(opf_xmldoc,
+                                                       date_html=publish_date_html),
         'identifiers': _discover_identifiers(opf_xmldoc),
         'subject': _discover_subject(opf_xmldoc),
         'file_size_in_bytes': file_size_in_bytes,
