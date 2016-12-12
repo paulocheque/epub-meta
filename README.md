@@ -80,7 +80,7 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
 
 ## Change Log
 
-##### 0.0.5 (2016-12-12)
+##### 0.0.6 (2016-12-12)
 
 - Parsing and reading authors in pr02.html file if available
 - Parsing and reading the publish date in pr01.html if available
