@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 # Update version and save
 # Go to 'files' link and upload the file
 
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 
 tests_require = [
 ]

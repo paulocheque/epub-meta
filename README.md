@@ -6,7 +6,7 @@
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
 
 
-**Latest version: 0.0.5 (2016/11)**
+**Latest version: 0.0.6 (2016/12)**
 
 Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
@@ -80,6 +80,10 @@ To discover and parse yourself the ePub OPF file, you can get the content of the
 
 ## Change Log
 
+##### 0.0.5 (2016-12-12)
+
+- Parsing and reading authors in pr02.html file if available
+- Parsing and reading the publish date in pr01.html if available
 
 ##### 0.0.5 (2016-11-02)
 
