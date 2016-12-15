@@ -26,7 +26,7 @@ install_requires = [
 # tests_require = parse_requirements('requirements-dev.txt')
 
 setup(name='epub_meta',
-      url='https://github.com/pluralsight/epub-meta',
+      url='https://github.com/paulocheque/epub-meta',
       author='Pluralsight',
       keywords='python epub metadata',
       description='',
