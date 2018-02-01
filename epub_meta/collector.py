@@ -173,7 +173,7 @@ def _discover_identifiers(opf_xmldoc):
 
 
 def _discover_subject(opf_xmldoc):
-    return __discover_dc(opf_xmldoc, 'subject')
+    return __discover_dc(opf_xmldoc, 'subject', first_only=False)
 
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
