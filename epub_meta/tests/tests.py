@@ -133,19 +133,19 @@ class GetEPubMetadataTests(unittest.TestCase):
 
     def test_subject(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
         data = get_epub_metadata(os.path.join(dir_path, 'georgia-cfi-20120521.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
         data = get_epub_metadata(os.path.join(dir_path, 'georgia-pls-ssml-20120322.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
         data = get_epub_metadata(os.path.join(dir_path, 'mathjax_tests.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
         data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
-        self.assertEqual(data.subject, 'Software Development')
+        self.assertEqual(data.subject, ['Software Development'])
         data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
-        self.assertEqual(data.subject, None)
+        self.assertEqual(data.subject, [])
 
     def test_cover_image(self):
         data = get_epub_metadata(os.path.join(dir_path, 'backbone-fundamentals.epub'))

@@ -91,6 +91,10 @@ def _discover_language(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'language')
 
 
+def _discover_description(opf_xmldoc):
+    return __discover_dc(opf_xmldoc, 'description')
+
+
 def _find_author_from_dom(xmldoc):
     # Only find a single author now with this algorithm but returning a list
     # because that's what caller expects
@@ -169,7 +173,7 @@ def _discover_identifiers(opf_xmldoc):
 
 
 def _discover_subject(opf_xmldoc):
-    return __discover_dc(opf_xmldoc, 'subject')
+    return __discover_dc(opf_xmldoc, 'subject', first_only=False)
 
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
@@ -364,6 +368,7 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         'epub_version': _discover_epub_version(opf_xmldoc),
         'title': _discover_title(opf_xmldoc),
         'language': _discover_language(opf_xmldoc),
+        'description': _discover_description(opf_xmldoc),
         'authors': _discover_authors(opf_xmldoc, authors_html=authors_html),
         'publisher': _discover_publisher(opf_xmldoc),
         'publication_date': _discover_publication_date(opf_xmldoc,
