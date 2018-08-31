@@ -9,6 +9,10 @@ from epub_meta.exceptions import EPubException
 
 IS_PY2 = sys.version_info < (3, 0)
 
+if IS_PY2:
+    from urllib import unquote
+else:
+    from urllib.parse import unquote
 
 class odict(dict):
     __setattr__ = dict.__setitem__
@@ -41,7 +45,7 @@ def find_img_tag(xmldoc, tag_name, attr, value):
     for tag in xmldoc.getElementsByTagName(tag_name):
         if attr in tag.attributes.keys() and tag.attributes[attr].value == value:
             if 'href' in tag.attributes.keys():
-                filepath = tag.attributes['href'].value
+                filepath = unquote(tag.attributes['href'].value)
                 filename, file_extension = os.path.splitext(filepath)
                 if file_extension in ('.gif', '.jpg', '.jpeg', '.png', '.svg'):
                     return filepath, file_extension
@@ -203,8 +207,9 @@ def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
     if filepath:
         # The cover image path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
-        # print('- Reading Cover Image file: {}/{}'.format(base_dir, filepath))
-        content = zf.read(os.path.join(base_dir, filepath))
+        # Also, normalize the path (ie opfpath/../cover.jpg -> cover.jpg)
+        coverpath = os.path.normpath(os.path.join(base_dir, filepath))
+        content = zf.read(coverpath)
         content = base64.b64encode(content)
 
     return content, extension
@@ -219,18 +224,19 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
     # ePub 3.x
     tag = find_tag(opf_xmldoc, 'item', 'properties', 'nav')
     if tag and 'href' in tag.attributes.keys():
-        filepath = tag.attributes['href'].value
+        filepath = unquote(tag.attributes['href'].value)
         # The xhtml file path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
         # print('- Reading Nav file: {}/{}'.format(base_dir, filepath))
-        nav_content = zf.read(os.path.join(base_dir, filepath))
+        npath = os.path.normpath(os.path.join(base_dir, filepath))
+        nav_content = zf.read(npath)
         toc_xmldoc = minidom.parseString(nav_content)
 
         _toc = []
 
         for n in toc_xmldoc.getElementsByTagName('a'):
             if n.firstChild and ('href' in n.attributes.keys()):
-                href = n.attributes['href'].value
+                href = unquote(n.attributes['href'].value)
                 # Discarding CFI links
                 if '.html' in href or '.xhtml' in href:
                     title = n.firstChild.nodeValue
@@ -261,11 +267,12 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
         if not tag:
             tag = find_tag(opf_xmldoc, 'item', 'id', 'ncxtoc')
         if tag and 'href' in tag.attributes.keys():
-            filepath = tag.attributes['href'].value
+            filepath = unquote(tag.attributes['href'].value)
             # The ncx file path is relative to the OPF file
             base_dir = os.path.dirname(opf_filepath)
             # print('- Reading NCX file: {}/{}'.format(base_dir, filepath))
-            ncx_content = zf.read(os.path.join(base_dir, filepath))
+            npath = os.path.normpath(os.path.join(base_dir, filepath))
+            ncx_content = zf.read(npath)
 
             toc_xmldoc = minidom.parseString(ncx_content)
 
@@ -341,8 +348,7 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     # e.g.: <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
     opf_filepath = container_xmldoc.getElementsByTagName('rootfile')[0].attributes['full-path'].value
 
-    # print('- Reading OPF file: {}'.format(opf_filepath))
-    opf = zf.read(opf_filepath)
+    opf = zf.read(os.path.normpath(opf_filepath))
     opf_xmldoc = minidom.parseString(opf)
 
     # This file is specific to the authors if it exists.

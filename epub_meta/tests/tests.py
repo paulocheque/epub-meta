@@ -228,11 +228,16 @@ class GetEPubMetadataTests(unittest.TestCase):
         data = get_epub_metadata(os.path.join(dir_path, 'mathjax_tests.epub'))
         self.assertEqual(data.file_size_in_bytes, 809373)
         data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'))
-        self.assertEqual(data.file_size_in_bytes, 1670383)
+        self.assertEqual(data.file_size_in_bytes, 1668149)
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
         self.assertEqual(data.file_size_in_bytes, 4346158)
         data = get_epub_metadata(os.path.join(dir_path, 'high-performance-computing-5.2.epub'))
         self.assertEqual(data.file_size_in_bytes, 3045262)
+
+    def test_relative_path(self):
+        # This book's cover has a relative path (sits at zip file root)
+        data = get_epub_metadata(os.path.join(dir_path, 'moby-dick.epub'), read_cover_image=True)
+        self.assertTrue('cover_image_content' in data)
 
     def test_encoding(self):
         data = get_epub_metadata(os.path.join(dir_path, 'progit.epub'))
