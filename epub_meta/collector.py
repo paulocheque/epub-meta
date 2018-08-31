@@ -203,8 +203,9 @@ def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
     if filepath:
         # The cover image path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
-        # print('- Reading Cover Image file: {}/{}'.format(base_dir, filepath))
-        content = zf.read(os.path.join(base_dir, filepath))
+        # Also, normalize the path (ie opfpath/../cover.jpg -> cover.jpg)
+        coverpath = os.path.normpath(os.path.join(base_dir, filepath))
+        content = zf.read(coverpath)
         content = base64.b64encode(content)
 
     return content, extension
@@ -223,7 +224,8 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
         # The xhtml file path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
         # print('- Reading Nav file: {}/{}'.format(base_dir, filepath))
-        nav_content = zf.read(os.path.join(base_dir, filepath))
+        npath = os.path.normpath(os.path.join(base_dir, filepath))
+        nav_content = zf.read(npath)
         toc_xmldoc = minidom.parseString(nav_content)
 
         _toc = []
@@ -265,7 +267,8 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
             # The ncx file path is relative to the OPF file
             base_dir = os.path.dirname(opf_filepath)
             # print('- Reading NCX file: {}/{}'.format(base_dir, filepath))
-            ncx_content = zf.read(os.path.join(base_dir, filepath))
+            npath = os.path.normpath(os.path.join(base_dir, filepath))
+            ncx_content = zf.read(npath)
 
             toc_xmldoc = minidom.parseString(ncx_content)
 
@@ -341,8 +344,7 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     # e.g.: <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
     opf_filepath = container_xmldoc.getElementsByTagName('rootfile')[0].attributes['full-path'].value
 
-    # print('- Reading OPF file: {}'.format(opf_filepath))
-    opf = zf.read(opf_filepath)
+    opf = zf.read(os.path.normpath(opf_filepath))
     opf_xmldoc = minidom.parseString(opf)
 
     # This file is specific to the authors if it exists.
