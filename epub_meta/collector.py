@@ -9,6 +9,10 @@ from epub_meta.exceptions import EPubException
 
 IS_PY2 = sys.version_info < (3, 0)
 
+if IS_PY2:
+    from urllib import unquote
+else:
+    from urllib.parse import unquote
 
 class odict(dict):
     __setattr__ = dict.__setitem__
@@ -41,7 +45,7 @@ def find_img_tag(xmldoc, tag_name, attr, value):
     for tag in xmldoc.getElementsByTagName(tag_name):
         if attr in tag.attributes.keys() and tag.attributes[attr].value == value:
             if 'href' in tag.attributes.keys():
-                filepath = tag.attributes['href'].value
+                filepath = unquote(tag.attributes['href'].value)
                 filename, file_extension = os.path.splitext(filepath)
                 if file_extension in ('.gif', '.jpg', '.jpeg', '.png', '.svg'):
                     return filepath, file_extension
@@ -220,7 +224,7 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
     # ePub 3.x
     tag = find_tag(opf_xmldoc, 'item', 'properties', 'nav')
     if tag and 'href' in tag.attributes.keys():
-        filepath = tag.attributes['href'].value
+        filepath = unquote(tag.attributes['href'].value)
         # The xhtml file path is relative to the OPF file
         base_dir = os.path.dirname(opf_filepath)
         # print('- Reading Nav file: {}/{}'.format(base_dir, filepath))
@@ -232,7 +236,7 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
 
         for n in toc_xmldoc.getElementsByTagName('a'):
             if n.firstChild and ('href' in n.attributes.keys()):
-                href = n.attributes['href'].value
+                href = unquote(n.attributes['href'].value)
                 # Discarding CFI links
                 if '.html' in href or '.xhtml' in href:
                     title = n.firstChild.nodeValue
@@ -263,7 +267,7 @@ def _discover_toc(zf, opf_xmldoc, opf_filepath):
         if not tag:
             tag = find_tag(opf_xmldoc, 'item', 'id', 'ncxtoc')
         if tag and 'href' in tag.attributes.keys():
-            filepath = tag.attributes['href'].value
+            filepath = unquote(tag.attributes['href'].value)
             # The ncx file path is relative to the OPF file
             base_dir = os.path.dirname(opf_filepath)
             # print('- Reading NCX file: {}/{}'.format(base_dir, filepath))
