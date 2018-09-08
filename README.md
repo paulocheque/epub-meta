@@ -6,7 +6,7 @@
 [![Code Status](https://landscape.io/github/paulocheque/epub-meta/master/landscape.png)](https://landscape.io/github/paulocheque/epub-meta/)
 
 
-**Latest version: 0.0.6 (2016/12)**
+**Latest version: 0.0.7 (2018/09)**
 
 Small **Python** library to read **metadata** information from an **ePub** (2 and 3) file. 
 
@@ -18,11 +18,11 @@ It does not depends on any library and run on Python 3 and 2.
 
 ## Usage
 
-    from epub_meta import get_epub_metadata, get_epub_opf_xml, EPubException
+    import epub_meta
 
 Discover the main metadata of the ePub file
 
-    >>> metadata = get_epub_metadata('/path/to/my_epub_file.epub')
+    >>> metadata = epub_meta.get_epub_metadata('/path/to/my_epub_file.epub')
     >>> type(metadata)
     <dict>
     >>> metadata
@@ -30,7 +30,7 @@ Discover the main metadata of the ePub file
 
 Example:
 
-    >>> data = get_epub_metadata('/path/to/pro_git.epub', read_cover_image=True, read_toc=True)
+    >>> data = epub_meta.get_epub_metadata('/path/to/pro_git.epub', read_cover_image=True, read_toc=True)
     >>> print(data)
 
     {
@@ -69,16 +69,22 @@ You can access the dict keys using *dot* notation:
 You should check for invalid ePub files or for unknown ePub conventions:
 
     try:
-        get_epub_metadata('/path/to/my_epub_file.epub')    
-    except EPubException as e:
+        epub_meta.get_epub_metadata('/path/to/my_epub_file.epub')    
+    except epub_meta.EPubException as e:
         print(e)
 
 To discover and parse yourself the ePub OPF file, you can get the content of the *OPF - XML* file:
 
-    print(get_epub_opf_xml('/path/to/my_epub_file.epub'))
+    print(epub_meta.get_epub_opf_xml('/path/to/my_epub_file.epub'))
 
 
 ## Change Log
+
+##### 0.0.7 (2016-09-08)
+
+- Fixed url encoded strings
+- Accepting relative paths
+- Discover description if available
 
 ##### 0.0.6 (2016-12-12)
 
