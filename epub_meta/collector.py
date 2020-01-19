@@ -180,6 +180,20 @@ def _discover_subject(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'subject', first_only=False)
 
 
+def _discover_calibre_series_index(opf_xmldoc):
+    tag = find_tag(opf_xmldoc, 'meta', 'name', 'calibre:series_index')
+    if tag and 'content' in tag.attributes.keys():
+        return tag.attributes['content'].value
+    return None
+
+
+def _discover_calibre_series(opf_xmldoc):
+    tag = find_tag(opf_xmldoc, 'meta', 'name', 'calibre:series')
+    if tag and 'content' in tag.attributes.keys():
+        return tag.attributes['content'].value
+    return None
+
+
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
     '''
     Find the cover image path in the OPF file.
@@ -382,6 +396,8 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         'identifiers': _discover_identifiers(opf_xmldoc),
         'subject': _discover_subject(opf_xmldoc),
         'file_size_in_bytes': file_size_in_bytes,
+        'calibre_series': _discover_calibre_series(opf_xmldoc),
+        'calibre_series_index': _discover_calibre_series_index(opf_xmldoc),
     })
 
     if read_cover_image:
