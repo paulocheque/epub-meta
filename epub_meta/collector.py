@@ -33,11 +33,20 @@ def iterate_all_tags(root):
             yield subnode
 
 
-def find_tag(xmldoc, tag_name, attr, value):
+def find_tags(xmldoc, tag_name, attr, value):
     # print('Finding tag: <{} {}="{}">'.format(tag_name, attr, value))
+    result = []
     for tag in xmldoc.getElementsByTagName(tag_name):
         if attr in tag.attributes.keys() and tag.attributes[attr].value == value:
-            return tag
+            result.append(tag)
+    return result
+
+
+def find_tag(xmldoc, tag_name, attr, value):
+    tags = find_tags(xmldoc, tag_name, attr, value)
+    if tags:
+        return tags[0]
+    return None
 
 
 def find_img_tag(xmldoc, tag_name, attr, value):
@@ -181,17 +190,21 @@ def _discover_subject(opf_xmldoc):
 
 
 def _discover_calibre_series_index(opf_xmldoc):
-    tag = find_tag(opf_xmldoc, 'meta', 'name', 'calibre:series_index')
-    if tag and 'content' in tag.attributes.keys():
-        return tag.attributes['content'].value
-    return None
+    tags = find_tags(opf_xmldoc, 'meta', 'name', 'calibre:series_index')
+    results = []
+    for tag in tags:
+        if tag and 'content' in tag.attributes.keys():
+            results.append(tag.attributes['content'].value)
+    return results
 
 
 def _discover_calibre_series(opf_xmldoc):
-    tag = find_tag(opf_xmldoc, 'meta', 'name', 'calibre:series')
-    if tag and 'content' in tag.attributes.keys():
-        return tag.attributes['content'].value
-    return None
+    tags = find_tags(opf_xmldoc, 'meta', 'name', 'calibre:series')
+    results = []
+    for tag in tags:
+        if tag and 'content' in tag.attributes.keys():
+            results.append(tag.attributes['content'].value)
+    return results
 
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
