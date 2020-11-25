@@ -1,5 +1,6 @@
 import base64
 import os
+import os.path
 from xml.dom import minidom
 import zipfile
 import sys
@@ -13,6 +14,7 @@ if IS_PY2:
     from urllib import unquote
 else:
     from urllib.parse import unquote
+
 
 class odict(dict):
     __setattr__ = dict.__setitem__
@@ -209,7 +211,11 @@ def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
         base_dir = os.path.dirname(opf_filepath)
         # Also, normalize the path (ie opfpath/../cover.jpg -> cover.jpg)
         coverpath = os.path.normpath(os.path.join(base_dir, filepath))
-        content = zf.read(coverpath)
+        try:
+            content = zf.read(coverpath)
+        except KeyError:
+            raise EPubException("Cannot read {} from EPub file {}".format(
+                coverpath, os.path.basename(zf.filename)))
         content = base64.b64encode(content)
 
     return content, extension
@@ -341,15 +347,19 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
     if not zipfile.is_zipfile(filepath):
         raise EPubException('Unknown file')
 
-    # print('Reading ePub file: {}'.format(filepath))
-    zf = zipfile.ZipFile(filepath, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True)
-    container = zf.read('META-INF/container.xml')
-    container_xmldoc = minidom.parseString(container)
-    # e.g.: <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
-    opf_filepath = container_xmldoc.getElementsByTagName('rootfile')[0].attributes['full-path'].value
+    try:
+        # print('Reading ePub file: {}'.format(filepath))
+        zf = zipfile.ZipFile(filepath, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True)
+        container = zf.read('META-INF/container.xml')
+        container_xmldoc = minidom.parseString(container)
+        # e.g.: <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+        opf_filepath = container_xmldoc.getElementsByTagName('rootfile')[0].attributes['full-path'].value
 
-    opf = zf.read(os.path.normpath(opf_filepath))
-    opf_xmldoc = minidom.parseString(opf)
+        opf = zf.read(os.path.normpath(opf_filepath))
+        opf_xmldoc = minidom.parseString(opf)
+    except IndexError:
+        raise EPubException("Cannot parse raw metadata from {}".format(
+            os.path.basename(filepath)))
 
     # This file is specific to the authors if it exists.
     authors_html = None
