@@ -34,11 +34,20 @@ def iterate_all_tags(root):
             yield subnode
 
 
-def find_tag(xmldoc, tag_name, attr, value):
+def find_tags(xmldoc, tag_name, attr, value):
     # print('Finding tag: <{} {}="{}">'.format(tag_name, attr, value))
+    result = []
     for tag in xmldoc.getElementsByTagName(tag_name):
         if attr in tag.attributes.keys() and tag.attributes[attr].value == value:
-            return tag
+            result.append(tag)
+    return result
+
+
+def find_tag(xmldoc, tag_name, attr, value):
+    tags = find_tags(xmldoc, tag_name, attr, value)
+    if tags:
+        return tags[0]
+    return None
 
 
 def find_img_tag(xmldoc, tag_name, attr, value):
@@ -179,6 +188,24 @@ def _discover_identifiers(opf_xmldoc):
 
 def _discover_subject(opf_xmldoc):
     return __discover_dc(opf_xmldoc, 'subject', first_only=False)
+
+
+def _discover_calibre_series_index(opf_xmldoc):
+    tags = find_tags(opf_xmldoc, 'meta', 'name', 'calibre:series_index')
+    results = []
+    for tag in tags:
+        if tag and 'content' in tag.attributes.keys():
+            results.append(tag.attributes['content'].value)
+    return results
+
+
+def _discover_calibre_series(opf_xmldoc):
+    tags = find_tags(opf_xmldoc, 'meta', 'name', 'calibre:series')
+    results = []
+    for tag in tags:
+        if tag and 'content' in tag.attributes.keys():
+            results.append(tag.attributes['content'].value)
+    return results
 
 
 def _discover_cover_image(zf, opf_xmldoc, opf_filepath):
@@ -391,6 +418,8 @@ def get_epub_metadata(filepath, read_cover_image=True, read_toc=True):
         'identifiers': _discover_identifiers(opf_xmldoc),
         'subject': _discover_subject(opf_xmldoc),
         'file_size_in_bytes': file_size_in_bytes,
+        'calibre_series': _discover_calibre_series(opf_xmldoc),
+        'calibre_series_index': _discover_calibre_series_index(opf_xmldoc),
     })
 
     if read_cover_image:
